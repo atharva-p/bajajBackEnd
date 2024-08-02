@@ -3,19 +3,27 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Your user details (replace with your actual details)
-const USER_ID = "your_full_name_ddmmyyyy";
-const EMAIL = "your_email@example.com";
-const ROLL_NUMBER = "your_roll_number";
-
 app.use(bodyParser.json());
+
+app.get("/bfhl", (req, res) => {
+  res.status(200).json({ operation_code: 1 });
+});
 
 app.post("/bfhl", (req, res) => {
   try {
-    const { data } = req.body;
+    const { user_id, email, roll_number, data } = req.body;
+
+    if (!user_id || !email || !roll_number || !data) {
+      throw new Error("Invalid input: all fields are required");
+    }
 
     if (!Array.isArray(data)) {
       throw new Error("Invalid input: data must be an array");
+    }
+
+    // additional input validation
+    if (data.length === 0) {
+      throw new Error("Invalid input: data array is empty");
     }
 
     const numbers = data.filter((item) => !isNaN(item));
@@ -31,20 +39,17 @@ app.post("/bfhl", (req, res) => {
 
     res.json({
       is_success: true,
-      user_id: USER_ID,
-      email: EMAIL,
-      roll_number: ROLL_NUMBER,
+      user_id: user_id,
+      email: email,
+      roll_number: roll_number,
       numbers: numbers,
       alphabets: alphabets,
       highest_alphabet: highestAlphabet,
     });
   } catch (error) {
-    res.status(400).json({ is_success: false, error: error.message });
+    console.error(error); // log the error
+    res.status(400).json({ is_success: false, error: "Invalid input" });
   }
-});
-
-app.get("/bfhl", (req, res) => {
-  res.json({ operation_code: 1 });
 });
 
 app.listen(port, () => {
