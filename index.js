@@ -1,8 +1,15 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors"); 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Your user details (replace with your actual details)
+const USER_ID = "atharva_patil_08082003";
+const EMAIL = "aa1685@srmist.edu.in";
+const ROLL_NUMBER = "RA2111032020006";
+
+app.use(cors()); 
 app.use(bodyParser.json());
 
 app.get("/bfhl", (req, res) => {
@@ -11,44 +18,33 @@ app.get("/bfhl", (req, res) => {
 
 app.post("/bfhl", (req, res) => {
   try {
-    const { user_id, email, roll_number, data } = req.body;
-
-    if (!user_id || !email || !roll_number || !data) {
-      throw new Error("Invalid input: all fields are required");
-    }
+    const { data } = req.body;
 
     if (!Array.isArray(data)) {
       throw new Error("Invalid input: data must be an array");
     }
 
-    // additional input validation
-    if (data.length === 0) {
-      throw new Error("Invalid input: data array is empty");
-    }
-
     const numbers = data.filter((item) => !isNaN(item));
     const alphabets = data.filter((item) => isNaN(item) && item.length === 1);
-    const highestAlphabet =
-      alphabets.length > 0
-        ? [
-            alphabets.reduce((a, b) =>
-              a.toLowerCase() > b.toLowerCase() ? a : b
-            ),
-          ]
-        : [];
 
     res.json({
       is_success: true,
-      user_id: user_id,
-      email: email,
-      roll_number: roll_number,
+      user_id: USER_ID,
+      email: EMAIL,
+      roll_number: ROLL_NUMBER,
       numbers: numbers,
       alphabets: alphabets,
-      highest_alphabet: highestAlphabet,
     });
   } catch (error) {
-    console.error(error); // log the error
-    res.status(400).json({ is_success: false, error: "Invalid input" });
+    console.error(error);
+    res.status(400).json({
+      is_success: false,
+      user_id: USER_ID,
+      email: EMAIL,
+      roll_number: ROLL_NUMBER,
+      numbers: [],
+      alphabets: [],
+    });
   }
 });
 
